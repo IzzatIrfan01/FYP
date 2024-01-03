@@ -1,14 +1,12 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
-import matplotlib.pyplot as plt
 from sklearn.gaussian_process import GaussianProcessRegressor
 from sklearn.gaussian_process.kernels import RBF, Matern, ConstantKernel as C
 import joblib
 import plotly.graph_objects as go
 from datetime import datetime, timedelta
 import logging
-import plotly.express as px
 
 # Create a logger
 logger = logging.getLogger(__name__)
