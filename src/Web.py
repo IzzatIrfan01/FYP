@@ -54,7 +54,7 @@ def main(category):
     st.title("NutriMatch: ")
 
     # Read data
-    df = pd.read_csv(r'D:\Bachelor of Computer Science (Artificial Intelligence)\FYP\src\Weekly_Average_FoodWaste.csv')
+    df = pd.read_csv('src/Weekly_Average_FoodWaste.csv')
 
     # Convert date column to datetime format
     df['Date'] = pd.to_datetime(df['Date'])
