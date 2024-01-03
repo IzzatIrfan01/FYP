@@ -5,8 +5,7 @@ import joblib
 import plotly.graph_objects as go
 from datetime import datetime, timedelta
 import logging
-from sklearn.gaussian_process import GaussianProcessRegressor
-from sklearn.gaussian_process.kernels import RBF, Matern, ConstantKernel as C
+import sklearn
 
 # Create a logger
 logger = logging.getLogger(__name__)
