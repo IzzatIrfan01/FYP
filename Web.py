@@ -1,4 +1,5 @@
 import streamlit as st
+from streamlit_option_menu import option_menu
 import pandas as pd
 import numpy as np
 import joblib
@@ -50,7 +51,21 @@ def plot_results(filtered_data, category, predicted_waste_train, predicted_waste
 
     st.plotly_chart(fig)
 
-# Streamlit app
+# Function to display item list table
+def display_item_list_table(csv_path, search_input):
+    try:
+        item_df = pd.read_csv(csv_path)
+    
+        # Filter items based on search input
+        if search_input:
+            item_df = item_df[item_df['Item'].str.contains(search_input, case=False)]
+
+        st.dataframe(item_df, hide_index=True)
+
+    except FileNotFoundError:
+        st.error("Item list CSV file not found. Please make sure the file exists.")
+
+# Function for prediction food waste
 def main(category):
     st.title("NutriMatch: ")
 
@@ -151,10 +166,33 @@ def main(category):
         # Display the dummy figure if the model is not loaded
         st.plotly_chart(dummy_fig)
 
-if __name__ == "__main__":
-    # User inputs the name
+# horizontal menu
+selected = option_menu(
+    menu_title= "NutriMatch", #required
+    options=["Home","Prediction","Items"],
+    icons=["house","bar-chart-line","file-earmark-fill"],
+    menu_icon="cast",
+    default_index=0,
+    orientation="horizontal"
+)
+
+# Add navigation bar with buttons
+if selected == "Home":
+    st.title(f"You have selected {selected}")
+
+if selected == "Prediction":
     # Define the chosen category for plotting
+    st.title(f"{selected} Visualization")
     selected_category = st.selectbox("Select Food Waste Category", ['Carbohydrates', 'Protein', 'Fat', 'Fiber'])
     main(selected_category)
+
+if selected == "Items":
+    st.title("Item List")
+    # Sidebar for search input
+    search_input = st.sidebar.text_input('Search Items:', '')
+    # Specify the path to your item list CSV file
+    item_list = "src\Merged_ItemList.csv"
+    display_item_list_table(item_list,search_input)
+    
 
     
