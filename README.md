@@ -1,1 +1,10 @@
-# FYP
+# NutriMatch: Using Machine Learning to Reduce Food Waste and Meet Nutritional Needs
+Food waste is a significant global challenge with far-reaching economic, social, and environmental implications. This project leverages the power of machine learning techniques to address food waste by developing predictive models and implementing data-driven strategies for waste reduction. The study examines a dataset including food waste data over a certain time period and predicts and generates insights using the Gaussian Process Regression (GPR) model.
+
+The study starts with an exploration of the dataset to discover trends, patterns, and important factors driving food waste generation. To get preliminary insights, descriptive statistics and visualizations are used. Following that, the dataset is preprocessed by dealing with missing values and outliers. The ARIMA model, a widely used technique for time series forecasting, is employed in the project to provide reliable forecasts.
+
+The GPR model predicts future food waste levels, allowing for proactive waste management planning and decision-making. The initiative provides useful insights into peak periods of food waste generation and highlights certain food categories that contribute considerably to waste. This insight is critical for developing and implementing targeted waste reduction methods such as improved inventory management, resource allocation optimization, and awareness initiatives.
+
+Furthermore, by addressing the environmental impact of food waste, the project contributes to sustainability efforts. The initiative promotes a more sustainable and efficient food system by decreasing waste at the source and optimizing resource utilization, ultimately leading to lower greenhouse gas emissions and resource depletion.
+
+Overall, the project contributes to a better knowledge of food waste trends, anticipating future waste levels, and offering actionable insights for waste reduction strategies. The project aims to make a significant impact in solving the global food waste crisis by raising awareness, engaging stakeholders, and encouraging behavioral changes.
