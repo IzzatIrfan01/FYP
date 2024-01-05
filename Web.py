@@ -191,7 +191,7 @@ if selected == "Items":
     # Sidebar for search input
     search_input = st.sidebar.text_input('Search Items:', '')
     # Specify the path to your item list CSV file
-    item_list = "src\Merged_ItemList.csv"
+    item_list = "src/Merged_ItemList.csv"
     display_item_list_table(item_list,search_input)
     
 
