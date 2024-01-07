@@ -51,19 +51,48 @@ def plot_results(filtered_data, category, predicted_waste_train, predicted_waste
 
     st.plotly_chart(fig)
 
+def get_paginated_data(item_df, current_page, items_per_page):
+    if items_per_page == "All":
+        return item_df
+    else:
+        start_idx = (current_page - 1) * items_per_page
+        end_idx = min(start_idx + items_per_page, len(item_df))
+        return item_df.iloc[start_idx:end_idx, :]
+
 # Function to display item list table
-def display_item_list_table(csv_path, search_input):
+def display_item_list_table(csv_path):
     try:
         item_df = pd.read_csv(csv_path)
-    
-        # Filter items based on search input
-        if search_input:
-            item_df = item_df[item_df['Item'].str.contains(search_input, case=False)]
+        
+        # Initialize session state if it doesn't exist
+        if 'current_page' not in st.session_state:
+            st.session_state.current_page = 1
 
-        st.dataframe(item_df, hide_index=True)
+        # Number of items per page
+        items_per_page = st.sidebar.selectbox("Items per page", [5, 10, 20, 50, 100, "All"], index=1)
 
-    except FileNotFoundError:
-        st.error("Item list CSV file not found. Please make sure the file exists.")
+        # Sidebar for search input
+        selected_item = st.sidebar.selectbox('Search Items:', item_df['Item Description'].unique())
+
+        # Filter items based on selected item
+        if selected_item:
+            selected_row = item_df[item_df['Item Description'] == selected_item].iloc[0]
+            
+            # Display selected item details in the sidebar
+            st.sidebar.subheader("Selected Item Details:")
+            
+            for col_name, col_value in selected_row.items():
+                st.sidebar.markdown(
+                    f"""
+                    <div style='display: flex; margin-bottom: 10px;'>
+                        <div style='border: 1px solid #09111a; padding: 10px; flex: 0.4; border-radius: 10px; 
+                        background-color: #09111a; color: white;'><strong>{col_name}:</strong></div>
+                        <div style='border: 1px solid #09111a; padding: 10px; margin-left: 10px; flex: 0.6; border-radius: 10px; 
+                        background-color: #09111a; color: white;'>{col_value}</div>
+                    </div>
+                    """, 
+                    unsafe_allow_html=True
+                )
 
 # Function for prediction food waste
 def main(category):
@@ -166,9 +195,15 @@ def main(category):
         # Display the dummy figure if the model is not loaded
         st.plotly_chart(dummy_fig)
 
+# Display the dashboard icon
+col1, col2 = st.columns([0.2,1])
+
+with col1:
+    st.image(r"WasteLess.png", width=500)
+    
 # horizontal menu
 selected = option_menu(
-    menu_title= "NutriMatch", #required
+    menu_title= None, #required
     options=["Home","Prediction","Items"],
     icons=["house","bar-chart-line","file-earmark-fill"],
     menu_icon="cast",
@@ -188,11 +223,9 @@ if selected == "Prediction":
 
 if selected == "Items":
     st.title("Item List")
-    # Sidebar for search input
-    search_input = st.sidebar.text_input('Search Items:', '')
     # Specify the path to your item list CSV file
     item_list = "src/Merged_ItemList.csv"
-    display_item_list_table(item_list,search_input)
+    display_item_list_table(item_list)
     
 
     
