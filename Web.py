@@ -94,6 +94,29 @@ def display_item_list_table(csv_path):
                     unsafe_allow_html=True
                 )
 
+        # Get the paginated data
+        paginated_data = get_paginated_data(item_df, st.session_state.current_page, items_per_page)
+
+        # Display the DataFrame without pagination if "All" is selected
+        if items_per_page == "All":
+            st.dataframe(item_df, hide_index=True)
+        else:
+            st.dataframe(paginated_data, hide_index=True)
+
+        # Add arrows at the bottom for pagination controls
+        col0, col1, col2, col3 = st.columns([0.6, 0.2, 0.2, 0.2])
+        if col1.button("&#9664; Previous"):
+            st.session_state.current_page = max(st.session_state.current_page - 1, 1)
+
+        total_pages = 1 if items_per_page == "All" else max(1, (len(item_df) + items_per_page - 1) // items_per_page)
+        col2.write(f"Page {st.session_state.current_page} of {total_pages}")
+
+        if col3.button("Next &#9654;"):
+            st.session_state.current_page = min(st.session_state.current_page + 1, total_pages)
+
+    except FileNotFoundError:
+        st.error("Item list CSV file not found. Please make sure the file exists.")
+
 # Function for prediction food waste
 def main(category):
     st.title("NutriMatch: ")
