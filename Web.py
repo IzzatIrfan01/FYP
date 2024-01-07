@@ -199,7 +199,7 @@ def main(category):
 col1, col2 = st.columns([0.2,1])
 
 with col1:
-    st.image(r"WasteLess.png", width=500)
+    st.image(r"src/WasteLess.png", width=500)
     
 # horizontal menu
 selected = option_menu(
