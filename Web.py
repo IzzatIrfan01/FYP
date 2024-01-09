@@ -174,7 +174,7 @@ def main(category):
             st.success("Model loaded successfully!")
         except FileNotFoundError:
             # Handle the FileNotFoundError
-            st.info(f" The food waste category of {category} does not has a saved model. Please choose another category.")
+            st.info(f" The food waste category of {category} does not has a saved model. Sorry for the inconvenience; we will train the model as soon as possible. Please select a different category.")
             return
 
     # Dummy figure
@@ -279,12 +279,21 @@ selected = option_menu(
 
 # Add navigation bar with buttons
 if selected == "Home":
-    st.title(f"You have selected {selected}")
+    st.markdown("<h1 style='color: green; font-size: 55px; line-height: 0.8;'>Reduce Waste</h1>", unsafe_allow_html=True)
+    st.markdown("<h1 style='color: green; font-size: 22px; line-height: 1.2;'>\"Welcome to our website devoted to the fight against food waste problem!\"</h1>", unsafe_allow_html=True)
+    st.markdown("""
+                
+                    Food waste has become a serious concern in today's globe, as the population is growing at an alarming rate. Artificial intelligence (AI) has the potential to significantly reduce food waste. AI can be used to optimise supply chain management, predict demand, and reduce food waste. At WasteLess, we are enthusiastic about decreasing food waste and building a more sustainable future. Our objective is to raise awareness about the unforeseen amount of food waste by creating a prediction model that forecasts food waste using machine learning techniques.
+
+                    Join us in the fight against food waste and help us make a difference. Let us work together to save resources, preserve food, and build a more sustainable future for future generations.
+
+                    Start making a difference today. We can minimise food waste together, one step at a time!
+                """)
 
 if selected == "Prediction":
     # Define the chosen category for plotting
     st.title(f"{selected} Visualization")
-    selected_category = st.selectbox("Select Food Waste Category", ['Carbohydrates', 'Protein', 'Fat', 'Fiber'])
+    selected_category = st.selectbox("Select Food Waste Category", ['Carbohydrates', 'Protein', 'Fat', 'Fiber', 'Vitamin'])
     main(selected_category)
 
 if selected == "Items":
