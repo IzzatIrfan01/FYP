@@ -2,11 +2,13 @@ import streamlit as st
 from streamlit_option_menu import option_menu
 import pandas as pd
 import numpy as np
+from sklearn.gaussian_process import GaussianProcessRegressor
+from sklearn.gaussian_process.kernels import RBF, Matern, ConstantKernel as C
 import joblib
 import plotly.graph_objects as go
+import plotly.express as px
 from datetime import datetime, timedelta
 import logging
-import sklearn
 
 # Create a logger
 logger = logging.getLogger(__name__)
@@ -63,23 +65,32 @@ def get_paginated_data(item_df, current_page, items_per_page):
 def display_item_list_table(csv_path):
     try:
         item_df = pd.read_csv(csv_path)
-        
+
+        desired_column_order = ['Date', 'Item Code', 'Item Description', 'Carbohydrates', 'Fiber', 'Protein', 'Fat', 'Qty', 'Unit Price']
+
+        act_waste_per_item = ['Item Description','Carbohydrates (g)','Fiber (g)','Protein (g)','Fat (g)']
+
+        # initialize new desired columns for dataset
+        rearranged_df = item_df[desired_column_order]
+
+        act_waste = item_df[act_waste_per_item]
+
         # Initialize session state if it doesn't exist
         if 'current_page' not in st.session_state:
             st.session_state.current_page = 1
 
         # Number of items per page
         items_per_page = st.sidebar.selectbox("Items per page", [5, 10, 20, 50, 100, "All"], index=1)
-
+        
         # Sidebar for search input
         selected_item = st.sidebar.selectbox('Search Items:', item_df['Item Description'].unique())
 
         # Filter items based on selected item
         if selected_item:
-            selected_row = item_df[item_df['Item Description'] == selected_item].iloc[0]
+            selected_row = act_waste[act_waste['Item Description'] == selected_item].iloc[0]
             
             # Display selected item details in the sidebar
-            st.sidebar.subheader("Selected Item Details:")
+            st.sidebar.subheader("Nutrition per Item Details:")
             
             for col_name, col_value in selected_row.items():
                 st.sidebar.markdown(
@@ -95,16 +106,16 @@ def display_item_list_table(csv_path):
                 )
 
         # Get the paginated data
-        paginated_data = get_paginated_data(item_df, st.session_state.current_page, items_per_page)
+        paginated_data = get_paginated_data(rearranged_df, st.session_state.current_page, items_per_page)
 
         # Display the DataFrame without pagination if "All" is selected
         if items_per_page == "All":
-            st.dataframe(item_df, hide_index=True)
+            st.dataframe(rearranged_df, hide_index=True)
         else:
             st.dataframe(paginated_data, hide_index=True)
 
         # Add arrows at the bottom for pagination controls
-        col0, col1, col2, col3 = st.columns([0.6, 0.2, 0.2, 0.2])
+        col0, col1, col2, col3 = st.columns([0.6, 0.2, 0.17, 0.2])
         if col1.button("&#9664; Previous"):
             st.session_state.current_page = max(st.session_state.current_page - 1, 1)
 
@@ -119,10 +130,9 @@ def display_item_list_table(csv_path):
 
 # Function for prediction food waste
 def main(category):
-    st.title("NutriMatch: ")
 
     # Read data
-    df = pd.read_csv('src/Weekly_Average_FoodWaste.csv')
+    df = pd.read_csv(r'src\Weekly_Average_FoodWaste.csv')
 
     # Convert date column to datetime format
     df['Date'] = pd.to_datetime(df['Date'])
@@ -212,8 +222,41 @@ def main(category):
         # Denormalize the predicted wastes
         predicted_waste_test = y_pred_test * np.max(filtered_data[chosen_category])
 
+        # Get the last date and its corresponding waste value
+        last_predicted_date = date_test[-1]
+        formatted_last_predicted_date = last_predicted_date.strftime("%d %B %Y")
+        last_predicted_waste = round(predicted_waste_test[-1],2)
+
         # Plot results
         plot_results(filtered_data, category, predicted_waste_train, predicted_waste_test, date_test, date_train, sigma_range_test)
+
+        st.text('INFO', help=f'The date represents the weekly average of {chosen_category} waste, with Sunday serving as the reference week.')
+
+        st.write(f"The amount of {chosen_category} that is predicted to be wasted in the next 30 days after September on {formatted_last_predicted_date} is {last_predicted_waste}g")
+
+        st.markdown("---")
+            
+        item_list = pd.read_csv(r"src\Item_FullList.csv")
+    
+        top_wasted_items = (
+            item_list.groupby("Item Description")[chosen_category].sum()
+            .reset_index()
+            .nlargest(10, columns=chosen_category)
+        )
+
+        # Display the horizontal bar chart
+        fig_waste_items = px.bar(
+            top_wasted_items,
+            x=chosen_category,
+            y="Item Description",  # Set "Item Description" as the y-axis
+            orientation='h',  # Specify the orientation as horizontal
+            title=f'<b>Top Wasted Items by {chosen_category} in grams (g)</b>',  
+            color_discrete_sequence=["#0083B8"] * len(top_wasted_items),
+            template="plotly_white",
+        )
+
+        st.plotly_chart(fig_waste_items)
+
     else:
         # Display the dummy figure if the model is not loaded
         st.plotly_chart(dummy_fig)
@@ -247,7 +290,7 @@ if selected == "Prediction":
 if selected == "Items":
     st.title("Item List")
     # Specify the path to your item list CSV file
-    item_list = "src/Merged_ItemList.csv"
+    item_list = "src/Item_FullList.csv"
     display_item_list_table(item_list)
     
 
