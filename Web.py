@@ -132,7 +132,7 @@ def display_item_list_table(csv_path):
 def main(category):
 
     # Read data
-    df = pd.read_csv(r'src\Weekly_Average_FoodWaste.csv')
+    df = pd.read_csv('src/Weekly_Average_FoodWaste.csv')
 
     # Convert date column to datetime format
     df['Date'] = pd.to_datetime(df['Date'])
@@ -236,7 +236,7 @@ def main(category):
 
         st.markdown("---")
             
-        item_list = pd.read_csv(r"src\Item_FullList.csv")
+        item_list = pd.read_csv("src/Item_FullList.csv")
     
         top_wasted_items = (
             item_list.groupby("Item Description")[chosen_category].sum()
